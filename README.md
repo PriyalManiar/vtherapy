@@ -1,21 +1,17 @@
-
----
-
-```markdown
-# Vtherapy: DL-based Post Injury Hand Rehabilitation System
+# VTherapy: DL-based Post Injury Hand Rehabilitation System
 
 ## Code Authors: Priyal Maniar & Gargi Vedpathak
 ## Published Work: [IEEE](https://ieeexplore.ieee.org/document/10842730)
 
 A deep learning-based virtual platform designed to track hand exercises and provide real-time feedback. Get your questions answered via a personalized "PhysioBot." The system uses MediaPipe for hand landmarking and a custom ResNet-LSTM architecture to classify exercise accuracy.
 
-##  Key Features
+## Key Features
 * **Real-time Exercise Tracking:** Leverages MediaPipe for high-fidelity hand skeletal tracking.
 * **Accuracy Classification:** Custom ResNet-LSTM model to evaluate finger spreading and fist-making precision.
 * **PhysioBot:** An NLTK-powered chatbot that guides users through their rehabilitation journey.
 * **Dockerized Infrastructure:** Consistent deployment across all environments including specialized support for FFmpeg and computer vision libraries.
 
-##  Tech Stack
+## Tech Stack
 * **Core:** Python 3.11, Flask
 * **ML/CV:** PyTorch, MediaPipe, OpenCV (Headless)
 * **NLP:** NLTK
@@ -38,18 +34,15 @@ vtherapy/
 │   ├── hand_landmarker.task  # MediaPipe hand model
 │   └── bestonemoreresnetlstm.pth  # Exercise classifier (LFS)
 ├── sample_exercises/      # Reference videos for accuracy comparison
-│   ├── spreadfingers.mp4
-│   └── makefist.mp4
 ├── cam_inputs/            # Uploaded camera recordings
 ├── processed_inputs/      # Processed frames/landmarks
 ├── scripts/               # Logic for CV, NLP, and Data
 ├── static/                # CSS, JS, and Video assets
 ├── templates/             # HTML Frontend
 └── requirements.txt
-```
 
 ---
-
+```
 ##  Installation & Setup
 
 ### 1. Prerequisites
