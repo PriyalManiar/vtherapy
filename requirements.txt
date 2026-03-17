@@ -10,6 +10,8 @@ nltk>=3.6
 # Video / hand exercise pipeline
 torchvision>=0.10
 pillow>=8.0
-opencv-python>=4.5
+# Use headless for Docker stability
+opencv-python-headless>=4.5
+# MediaPipe needs specific numpy range
 mediapipe>=0.10
-numpy>=1.19
+numpy>=1.19,<2.0.0
