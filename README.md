@@ -1,86 +1,97 @@
-# VTherapy
 
-Hand physiotherapy app: chatbot, video exercise recognition, tracking, and appointment booking.
+---
 
-## Run with Docker
+```markdown
+# Vtherapy: DL-based Post Injury Hand Rehabilitation System
 
-### 1. Build and run
+## Code Authors: Priyal Maniar & Gargi Vedpathak
+## Published Work: [IEEE](https://ieeexplore.ieee.org/document/10842730)
 
-```bash
-docker build -t vtherapy .
-docker run -p 5001:5001 vtherapy
-```
+A deep learning-based virtual platform designed to track hand exercises and provide real-time feedback. Get your questions answered via a personalized "PhysioBot." The system uses MediaPipe for hand landmarking and a custom ResNet-LSTM architecture to classify exercise accuracy.
 
-Open **http://localhost:5001** in your browser.
+##  Key Features
+* **Real-time Exercise Tracking:** Leverages MediaPipe for high-fidelity hand skeletal tracking.
+* **Accuracy Classification:** Custom ResNet-LSTM model to evaluate finger spreading and fist-making precision.
+* **PhysioBot:** An NLTK-powered chatbot that guides users through their rehabilitation journey.
+* **Dockerized Infrastructure:** Consistent deployment across all environments including specialized support for FFmpeg and computer vision libraries.
 
-### 2. Run with persistent data (DB, uploads)
+##  Tech Stack
+* **Core:** Python 3.11, Flask
+* **ML/CV:** PyTorch, MediaPipe, OpenCV (Headless)
+* **NLP:** NLTK
+* **Infrastructure:** Docker, Docker Compose, Git LFS
 
-Using docker-compose:
+---
 
-```bash
-docker compose up --build
-```
-
-Or with plain docker:
-
-```bash
-docker run -p 5001:5001 \
-  -v vtherapy_instance:/app/instance \
-  -v vtherapy_cam_inputs:/app/cam_inputs \
-  -v vtherapy_processed:/app/processed_inputs \
-  vtherapy
-```
-
-### 3. Optional: Mail env vars for appointment form
-
-```bash
-docker run -p 5001:5001 \
-  -e MAIL_USERNAME=your@email.com \
-  -e MAIL_PASSWORD=yourpassword \
-  vtherapy
-```
-
-## Run without Docker (development)
-
-Requires Python 3.8+, ffmpeg, and pip.
-
-```bash
-pip install -r requirements.txt
-python -c "import nltk; nltk.download('punkt')"
-python -m scripts.download_hand_landmarker   # if models/hand_landmarker.task missing
-python -m scripts.chatbot_train              # if models/data.pth missing
-python run.py
-```
-
-Open **http://127.0.0.1:5001**.
-
-## Project structure
-
-```
+## Project Structure
+```text
 vtherapy/
 ├── run.py                 # App entry point
 ├── Dockerfile
+├── docker-compose.yml     # Docker orchestration
 ├── config/
 │   └── intents.json       # Chatbot intents
 ├── instance/
 │   └── virtuotherapy.db   # SQLite DB (created on first run)
 ├── models/                # ML models
 │   ├── data.pth           # Chatbot model (from chatbot_train)
-│   ├── hand_landmarker.task  # MediaPipe hand model (download if missing)
-│   └── bestonemoreresnetlstm.pth  # Exercise classifier
+│   ├── hand_landmarker.task  # MediaPipe hand model
+│   └── bestonemoreresnetlstm.pth  # Exercise classifier (LFS)
 ├── sample_exercises/      # Reference videos for accuracy comparison
 │   ├── spreadfingers.mp4
 │   └── makefist.mp4
 ├── cam_inputs/            # Uploaded camera recordings
 ├── processed_inputs/      # Processed frames/landmarks
-├── scripts/
-├── static/
-├── templates/
+├── scripts/               # Logic for CV, NLP, and Data
+├── static/                # CSS, JS, and Video assets
+├── templates/             # HTML Frontend
 └── requirements.txt
 ```
 
-## Requirements
+---
 
-- Python 3.8+ (or Docker)
-- ffmpeg (for video conversion)
-- Optional: `MAIL_USERNAME`, `MAIL_PASSWORD` env vars for appointment emails
+##  Installation & Setup
+
+### 1. Prerequisites
+* [Git LFS](https://git-lfs.com/) installed on your local machine.
+* **Optional:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) for containerized execution.
+
+### 2. Clone and Initialize
+```bash
+git clone [https://github.com/PriyalManiar/vtherapy.git](https://github.com/PriyalManiar/vtherapy.git)
+cd vtherapy
+git lfs pull
+```
+
+### 3. Run with Docker (Recommended)
+```bash
+# This builds the image and starts the Flask server on port 5001
+docker-compose up --build
+```
+The app will be accessible at `http://localhost:5001`.
+
+### 4. Run without Docker (Development)
+Requires Python 3.8+, ffmpeg, and pip.
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Setup models and NLP data
+python -c "import nltk; nltk.download('punkt')"
+python -m scripts.download_hand_landmarker   # if hand_landmarker.task missing
+python -m scripts.chatbot_train              # if data.pth missing
+
+# Launch
+python run.py
+```
+Open `http://127.0.0.1:5001`.
+
+---
+
+##  Development & Testing
+To verify the MediaPipe integration inside the container, run:
+```bash
+docker exec -it vtherapy-vtherapy-1 python -c "import mediapipe as mp; print('MediaPipe Version:', mp.__version__)"
+```
+---
+
