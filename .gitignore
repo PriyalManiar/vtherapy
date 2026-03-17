@@ -8,6 +8,14 @@ processed_inputs/*
 !cam_inputs/.gitkeep
 !processed_inputs/.gitkeep
 
+# Ignore the actual frames and landmarks generated during runtime
+processed_inputs/frames/*
+processed_inputs/landmarks/*
+
+# But do NOT ignore the .gitkeep files that hold the folders open
+!processed_inputs/frames/.gitkeep
+!processed_inputs/landmarks/.gitkeep
+
 # Ignore system junk
 __pycache__/
 venv/
