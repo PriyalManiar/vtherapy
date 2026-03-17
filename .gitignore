@@ -1,14 +1,18 @@
-# Model weights
-*.pth
-*.h5
-models/
+# Ignore huge model weights only
+models/bestonemoreresnetlstm.pth
 
-# Video captures and uploads
+# Ignore all user-uploaded content, but keep the folders
 uploads/
-*.mp4
-*.webm
+cam_inputs/*
+processed_inputs/*
+!cam_inputs/.gitkeep
+!processed_inputs/.gitkeep
 
-# Python/System junk
+# Ignore system junk
 __pycache__/
 venv/
 .DS_Store
+instance/virtuotherapy.db
+
+# Note: We are NOT ignoring *.pth or *.mp4 globally anymore 
+# so that data.pth and sample_exercises stay in the repo.
