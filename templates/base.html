@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.7.2/font/bootstrap-icons.min.css"
+    />
+    <link
+      href="{{ url_for('static', filename='css/chatbot.css') }}"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/style.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    body {
+      background-color: #e3f2fd; /* Light blue background */
+      color: #000; /* Black text color */
+    }
+    .navbar-nav {
+      margin-left: auto; /* Center navbar items */
+      margin-right: auto; /* Center navbar items */
+    }
+    .nav-item {
+      margin: 0 15px; /* Add spacing between navbar items */
+    }
+    .page-content-centered {
+      min-height: calc(100vh - 120px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <span class="navbar-brand mb-0 h1">Virtuotherapy</span>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('vtherapy') }}">VTherapy</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('track') }}">Track+</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('book') }}">Book Appointment</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#"
+              ><i class="bi bi-fire" style="color: orange"></i>
+              <span id="streak">{{ streak }}</span></a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="#"
+              data-toggle="modal"
+              data-target="#profileModal"
+            >
+              <i class="bi bi-person" style="color: black"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">{% block content %} {% endblock %}</div>
+
+    <div
+      class="modal fade"
+      id="profileModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="profileModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 14px; overflow: hidden;">
+          <div class="modal-header" style="background: #e3f2fd;">
+            <h5 class="modal-title" id="profileModalLabel">
+              <i class="bi bi-person-circle mr-2"></i>Profile
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-4 mb-3 mb-md-0">
+                <div class="card h-100" style="border-radius: 12px;">
+                  <div class="card-body text-center">
+                    <img
+                      src="{{ url_for('static', filename='images/profilepic.jpg') }}"
+                      class="rounded-circle"
+                      alt="Profile Picture"
+                      style="width: 110px; height: 110px; object-fit: cover; border: 3px solid #90caf9;"
+                    />
+                    <h5 class="mt-3 mb-0">Aditi Sharma</h5>
+                    <div class="text-muted" style="font-size: 0.95rem;">Patient</div>
+
+                    <hr />
+
+                    <div class="text-left">
+                      <div class="d-flex justify-content-between">
+                        <span class="text-muted">Age</span>
+                        <span><strong>35</strong></span>
+                      </div>
+                      <div class="d-flex justify-content-between mt-2">
+                        <span class="text-muted">Gender</span>
+                        <span><strong>Female</strong></span>
+                      </div>
+                      <div class="d-flex justify-content-between mt-2">
+                        <span class="text-muted">Email</span>
+                        <span><strong>aditi@example.com</strong></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="card" style="border-radius: 12px;">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3">
+                      <i class="bi bi-clipboard2-pulse mr-2"></i>Therapy Details
+                    </h5>
+
+                    <div class="row">
+                      <div class="col-sm-6 mb-3">
+                        <div class="p-3" style="background: #f7fbff; border-radius: 12px;">
+                          <div class="text-muted" style="font-size: 0.9rem;">Condition</div>
+                          <div><strong>Orthopaedic injury</strong></div>
+                        </div>
+                      </div>
+                      <div class="col-sm-6 mb-3">
+                        <div class="p-3" style="background: #f7fbff; border-radius: 12px;">
+                          <div class="text-muted" style="font-size: 0.9rem;">Physiotherapist</div>
+                          <div><strong>Dr Aishwarya Dev</strong></div>
+                        </div>
+                      </div>
+                      <div class="col-sm-12">
+                        <div class="p-3" style="background: #f7fbff; border-radius: 12px;">
+                          <div class="text-muted" style="font-size: 0.9rem;">Recommended plan</div>
+                          <div><strong>6 weeks</strong> • Daily guided VTherapy + weekly progress review</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mt-3 p-3" style="background: #fff; border: 1px solid #e3f2fd; border-radius: 12px;">
+                      <div class="text-muted" style="font-size: 0.9rem;">Notes</div>
+                      <div style="line-height: 1.4;">
+                        Keep exercises slow and controlled. Stop if sharp pain or numbness occurs and contact your physiotherapist.
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" style="background: #f7fbff;">
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" disabled title="Coming soon">
+              Edit Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="container">
+      <div class="chatbox">
+          <div class="chatbox__support">
+              <div class="chatbox__header">
+                <div class="chatbox__message--header">
+                  <img width="34" height="34" src="https://img.icons8.com/color/48/music-robot.png" alt="image">
+                </div>  
+                <div class="chatbox__content--header">
+                      <h1 class="chatbox__description--header ml-2">PhysioBot</h1>
+                </div>
+              </div>
+              <div class="chatbox__messages">
+                <div><p class="chatbox__description--message">Hey there! I am PhysioBot, your very own physiotherapy assistant. I'm here to solve your queries. Ask me something.</p></div>
+              </div>
+              <div class="chatbox__footer">
+                  <input type="text" placeholder="Write a message...">
+                  <button class="chatbox__send--footer send__button">Send</button>
+              </div>
+          </div>
+          <div class="chatbox__button">
+              <button><img width="37" height="37"src="https://img.icons8.com/ios-filled/50/228BE6/messaging-.png" /></button>
+   
+          </div>
+      </div>
+  </div>
+  
+      <script>
+          $SCRIPT_ROOT = {{ request.script_root|tojson }};
+      </script>
+      <script type="text/javascript" src="{{ url_for('static', filename='app.js') }}"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.navbar-nav .nav-item a');
+    
+        navLinks.forEach(link => {
+          if (link.getAttribute('href') === currentPath) {
+            link.classList.add('text-primary', 'fw-bold'); // Use Bootstrap's text color utility class
+            link.parentElement.classList.add('active'); // Optional: for additional styling
+          } else {
+            // Ensure non-active links do not have these classes
+            link.classList.remove('text-primary', 'fw-bold');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

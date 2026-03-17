@@ -1,0 +1,409 @@
+{% extends "base.html" %} {% block title %}Track your Progress{% endblock %} {%
+block content %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+  </head>
+  <style>
+    .container {
+      padding-top: 20px;
+    }
+
+    #chartMode {
+      border: 2px solid #90e0ef; /* Lighter shade of blue for border */
+      background-color: #ffffff; /* White background for the dropdown */
+      color: #000000; /* Darker shade of blue for text */
+      padding: 10px;
+      border-radius: 5px; /* Rounded corners */
+      font-size: 16px; /* Larger font size */
+      cursor: pointer; /* Cursor changes to pointer to indicate it's clickable */
+      outline: none; /* Removes the outline to make it prettier */
+      margin-bottom: 20px; /* Spacing below the dropdown */
+    }
+
+    #chartMode:hover {
+      background-color: #e0f7fa; /* Lighter blue background on hover */
+    }
+
+    #chartMode:focus {
+      border-color: #0077b6; /* Darker blue border on focus */
+    }
+
+    #chartMode option {
+      padding: 10px; /* Padding inside options for better readability */
+    }
+    #exerciseDistributionChart {
+      width: 200px;
+      height: 200px;
+    }
+    .chart-container {
+      width: 400px;
+      height: 400px;
+    }
+    .goal-container {
+      width: 200px;
+      height: 200px;
+    }
+    .custom-select-dropdown {
+      padding-top: 5rem; /* Adjust top padding */
+      padding-bottom: 5rem; /* Adjust bottom padding */
+      line-height: 5; /* Adjust line height if necessary */
+    }
+    .progress-chart-canvas {
+      width: 100%; /* Makes it responsive */
+      height: auto !important;
+    }
+    .filters-card {
+      background: #f7fbff;
+      border: 1px solid #e3f2fd;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+    .filters-card label {
+      font-size: 0.9rem;
+      color: #444;
+      margin-bottom: 4px;
+    }
+    .track-left-col {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 200px);
+      padding-top: 2.5rem;
+    }
+    .goal-meter-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 120px;
+      position: relative;
+    }
+    .goal-meter-wrap canvas {
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 100%;
+    }
+    .track-charts-col {
+      min-height: calc(100vh - 200px);
+      display: flex;
+      flex-direction: column;
+    }
+    .progress-chart-wrap {
+      flex: 1;
+      min-height: 320px;
+      position: relative;
+    }
+    .progress-chart-wrap canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
+
+  <body>
+    <div class="row">
+      <div class="col-4 track-left-col">
+        <div class="row justify-content-left ml-2">
+          <h2>Track your Progress</h2>
+        </div>
+        <div class="filters-card mr-2 ml-2">
+          <div class="form-group mb-0">
+            <label for="chartMode" class="mb-1"><strong>View</strong></label>
+            <select id="chartMode" class="form-control form-control-sm w-100">
+              <option value="daily">Daily (latest day)</option>
+              <option value="weekly">Weekly (this week)</option>
+              <option value="overall" selected>Overall</option>
+            </select>
+          </div>
+        </div>
+        <div class="goal-meter-wrap mr-2 ml-2 mt-3">
+          <canvas id="goalTrackerChart"></canvas>
+        </div>
+      </div>
+      <div class="col-1"></div>
+
+      <div class="col-7 track-charts-col">
+        <div class="progress-chart-wrap">
+          <canvas id="progressChart" class="progress-chart-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!--
+     <div class="chart-container mt-5 p-3">
+      <canvas id="exerciseDistributionChart"></canvas>
+    </div>
+    -->
+
+    <script>
+      const exercisesData = {{ exercises_data | safe }};
+      const individualGoal = 5;
+
+      const today = new Date().toISOString().slice(0, 10);
+      const todayData = exercisesData.filter(d => (d.timestamp || '').startsWith(today));
+      const palmfingersCount = todayData.filter(d => (d.type || '').toLowerCase() === 'palmfingers').length;
+      const palmfistCount = todayData.filter(d => (d.type || '').toLowerCase() === 'palmfist').length;
+
+      const palmfingersCompletion = Math.min((Number(palmfingersCount) / individualGoal) * 100, 100);
+      const palmfistCompletion = Math.min((Number(palmfistCount) / individualGoal) * 100, 100);
+      const averageCompletion = Math.round((palmfingersCompletion + palmfistCompletion) / 2);
+
+      const ctxGoalTracker = document.getElementById('goalTrackerChart').getContext('2d');
+
+        const customTextPlugin = {
+            id: 'customTextPlugin',
+            afterDraw: function(chart) {
+                const ctx = chart.ctx;
+                const width = chart.width;
+                const height = chart.height;
+                ctx.restore();
+
+                const titleText = "Today's Goal Meter";
+                ctx.fillStyle = '#444';
+                ctx.font = "bold 14px Arial";
+                ctx.textAlign = 'center';
+                ctx.fillText(titleText, width / 2, height / 6.5);
+
+                const goalText = "Goal: 5 reps per exercise";
+                const motivationalText = averageCompletion < 70 ? "Great progress, keep going!" : "Great job, well done!";
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = '#000';
+                ctx.font = "bold 11px Arial";
+                ctx.fillText(goalText, width / 2, height - 20);
+                ctx.fillStyle = averageCompletion < 70 ? "#ff8c00" : "#32cd32";
+                ctx.font = "bold 12px Arial";
+                ctx.fillText(motivationalText, width / 2, height - 36);
+                ctx.fillStyle = '#000';
+                ctx.font = "bold 16px Arial";
+                ctx.fillText(averageCompletion + '%', width / 2, height / 2.3);
+
+                ctx.save();
+            }
+        };
+
+        const goalTrackerChart = new Chart(ctxGoalTracker, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [averageCompletion, 100 - averageCompletion],
+                    backgroundColor: ['rgba(54, 162, 235, 0.7)', 'rgba(220, 220, 220, 0.2)'],
+                    borderColor: ['rgba(54, 162, 235, 1)', 'rgba(220, 220, 220, 1)'],
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                rotation: 270,
+                circumference: 180,
+                cutout: '50%',
+                plugins: { legend: { display: false }, tooltip: { enabled: false }, title: { display: false } }
+            },
+            plugins: [customTextPlugin]
+        });
+    </script>
+
+    <script>
+      const ctx = document.getElementById('progressChart').getContext('2d');
+      let progressChart;
+
+      const prettyExerciseName = (t) => {
+        if (t === 'palmfist') return 'Make a Fist';
+        if (t === 'palmfingers') return 'Spread Palm Fingers';
+        return t;
+      };
+
+      const getSelectedFilters = () => {
+        return {
+          mode: document.getElementById('chartMode').value,
+          exercise: 'all',
+          range: 'all',
+          metric: 'accuracy',
+        };
+      };
+
+      const filteredData = (exerciseType, range) => {
+        let data = exercisesData;
+        if (exerciseType !== 'all') {
+          data = data.filter(d => d.type === exerciseType);
+        }
+        if (range && range !== 'all') {
+          const days = range === '7d' ? 7 : 30;
+          const cutoff = moment().subtract(days, 'days');
+          data = data.filter(d => moment(d.timestamp).isSameOrAfter(cutoff));
+        }
+        return data;
+      };
+
+      const updateChart = (mode, exerciseType, metric) => {
+          let labels = [];
+          let palmfingersData = [];
+          let palmfistData = [];
+
+          const f = getSelectedFilters();
+          const data = filteredData(exerciseType, f.range);
+
+          if (mode === 'daily') {
+              if (!data.length) {
+                labels = [];
+              } else {
+                const latestDate = moment.max(data.map(d => moment(d.timestamp))).format('YYYY-MM-DD');
+                let dailyData = data.filter(d => moment(d.timestamp).format('YYYY-MM-DD') === latestDate);
+                dailyData.sort((a, b) => moment(a.timestamp).diff(moment(b.timestamp)));
+                dailyData.forEach((d, index) => {
+                  labels.push(index + 1);
+                  if (metric === 'accuracy') {
+                    if (d.type === 'palmfingers') palmfingersData.push(d.accuracy);
+                    if (d.type === 'palmfist') palmfistData.push(d.accuracy);
+                  } else {
+                    // reps = one entry = one repetition/session
+                    if (d.type === 'palmfingers') palmfingersData.push(1);
+                    if (d.type === 'palmfist') palmfistData.push(1);
+                  }
+                });
+              }
+          } else if (mode === 'weekly') {
+              const startOfWeek = moment().startOf('isoWeek');
+              let weeklyData = Array.from({ length: 7 }, () => ({ palmfingers: [], palmfist: [] }));
+              data.forEach(d => {
+                  const dayIndex = moment(d.timestamp).diff(startOfWeek, 'days');
+                  if (dayIndex >= 0 && dayIndex < 7) {
+                      if (metric === 'accuracy') {
+                        weeklyData[dayIndex][d.type].push(d.accuracy);
+                      } else {
+                        weeklyData[dayIndex][d.type].push(1);
+                      }
+                  }
+              });
+              weeklyData.forEach((dayData, index) => {
+                  const dayLabel = startOfWeek.clone().add(index, 'days').format('ddd D MMM');
+                  labels.push(dayLabel);
+                  const pf = dayData.palmfingers.length
+                    ? (metric === 'accuracy'
+                        ? dayData.palmfingers.reduce((acc, curr) => acc + curr, 0) / dayData.palmfingers.length
+                        : dayData.palmfingers.reduce((acc, curr) => acc + curr, 0))
+                    : (metric === 'accuracy' ? null : 0);
+                  const fist = dayData.palmfist.length
+                    ? (metric === 'accuracy'
+                        ? dayData.palmfist.reduce((acc, curr) => acc + curr, 0) / dayData.palmfist.length
+                        : dayData.palmfist.reduce((acc, curr) => acc + curr, 0))
+                    : (metric === 'accuracy' ? null : 0);
+                  palmfingersData.push(pf);
+                  palmfistData.push(fist);
+              });
+          } else if (mode === 'overall') {
+              // Overall: show by date (grouped)
+              const byDay = {};
+              const norm = (t) => (t || '').toLowerCase().replace(/\s/g, '');
+              data.forEach(d => {
+                const day = moment(d.timestamp).format('YYYY-MM-DD');
+                byDay[day] = byDay[day] || { palmfingers: [], palmfist: [] };
+                const type = (norm(d.type) === 'palmfist') ? 'palmfist' : (norm(d.type) === 'palmfingers') ? 'palmfingers' : null;
+                if (type) {
+                  if (metric === 'accuracy') byDay[day][type].push(d.accuracy);
+                  else byDay[day][type].push(1);
+                }
+              });
+
+              labels = Object.keys(byDay).sort();
+              labels.forEach(day => {
+                const pfArr = byDay[day].palmfingers;
+                const fistArr = byDay[day].palmfist;
+                if (metric === 'accuracy') {
+                  palmfingersData.push(pfArr.length ? (pfArr.reduce((a, c) => a + c, 0) / pfArr.length) : null);
+                  palmfistData.push(fistArr.length ? (fistArr.reduce((a, c) => a + c, 0) / fistArr.length) : null);
+                } else {
+                  palmfingersData.push(pfArr.length ? pfArr.reduce((a, c) => a + c, 0) : 0);
+                  palmfistData.push(fistArr.length ? fistArr.reduce((a, c) => a + c, 0) : 0);
+                }
+              });
+          }
+
+          if (progressChart) {
+              progressChart.destroy();
+          }
+
+          progressChart = new Chart(ctx, {
+              type: (mode === 'weekly' || metric === 'reps') ? 'bar' : 'line',
+              data: {
+                  labels: labels,
+                  datasets: [{
+                      label: `${prettyExerciseName('palmfingers')} ${metric === 'accuracy' ? 'Accuracy' : 'Reps'}`,
+                      data: palmfingersData,
+                      borderColor: 'rgb(75, 192, 192)',
+                      backgroundColor: (mode === 'weekly' || metric === 'reps') ? 'rgba(75, 192, 192, 0.5)' : 'rgba(0, 0, 0, 0)',
+                      tension: 0.1,
+                      fill: false
+                  }, {
+                      label: `${prettyExerciseName('palmfist')} ${metric === 'accuracy' ? 'Accuracy' : 'Reps'}`,
+                      data: palmfistData,
+                      borderColor: 'rgb(255, 99, 132)',
+                      backgroundColor: (mode === 'weekly' || metric === 'reps') ? 'rgba(255, 99, 132, 0.5)' : 'rgba(0, 0, 0, 0)',
+                      tension: 0.1,
+                      fill: false
+                  }]
+              },
+              options: {
+                scales: {
+                    x: {
+                        
+                        ...(mode === 'weekly' ? {
+                            grid: {
+                                offset: true
+                            }
+                        } : {}),
+                        
+                        ...(mode !== 'weekly' ? {
+                            beginAtZero: true  
+                        } : {})
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                          display: true,
+                          text: metric === 'accuracy' ? 'Accuracy (%)' : 'Repetitions (count)'
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+
+                    title: {
+                      display: true, 
+                      text: metric === 'accuracy' ? "Exercise Accuracy Chart" : "Exercise Repetitions Chart",
+                      font: {
+                        size: 20, 
+                        weight: "bold", 
+                      },
+                      color: "#444", 
+                      padding: {
+                        top: 10,
+                        bottom: 10, 
+                      },
+                    },
+                  },
+            }
+          });
+      };
+
+      const rerender = () => {
+        const f = getSelectedFilters();
+        updateChart(f.mode, f.exercise, f.metric);
+      };
+
+      document.getElementById('chartMode').addEventListener('change', rerender);
+
+      rerender();
+    </script>
+  </body>
+</html>
+{% endblock %}

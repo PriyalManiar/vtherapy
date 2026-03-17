@@ -1,0 +1,14 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.git/
+.gitignore
+.env
+.DS_Store
+*.md
+instance/*.db
+cam_inputs/
+processed_inputs/
+*.log

@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}Book an Appointment{% endblock %}
+{% block content %}
+  <style>
+    .form-container {
+      background-color: white; /* Sets the form background to white */
+    }
+
+    .form-label {
+      color: #000000; /* Sets the label text color to Bootstrap's default blue; adjust as needed */
+    }
+
+    .form-input {
+      background-color: #e3f2fd; /* Bootstrap's default blue; adjust the color as needed */
+      color: black; /* Sets the input text color to white */
+      border: none; /* Removes the default input border */
+    }
+
+    .form-input::placeholder {
+      color: black; /* Lightens the placeholder text */
+    }
+
+    .submit-btn {
+      background-color: #007bff; /* Optional: Customize submit button's background */
+      color: white; /* Optional: Customize submit button's text color */
+      border: none; /* Optional: Removes the submit button's border */
+    }
+
+    /* Add this to improve accessibility and visual feedback */
+    .form-input:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .form-input2 {
+      background-color: #e3f2fd; /* Bootstrap's default blue; adjust the color as needed */
+
+      border: none; /* Removes the default input border */
+      color: black; /* This will set the text color for options */
+    }
+
+    .form-input2:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .form-input2::placeholder {
+      color: black; /* Lightens the placeholder text */
+    }
+
+    /* Targeting date and time input types specifically for their placeholders */
+    input[type="date"]::placeholder,
+    input[type="time"]::placeholder,
+    input[type="tel"]::placeholder,
+    input[type="number"]::placeholder,
+    input[type="text"]::placeholder,
+    textarea::placeholder {
+      color: black; /* Change placeholder text to black */
+    }
+
+    /* Some browsers, particularly on mobile, might need additional targeting */
+    ::-webkit-datetime-edit, /* Targets WebKit-based browsers like Chrome and Safari */
+::-webkit-datetime-edit-fields-wrapper,
+::-webkit-datetime-edit-text,
+::-webkit-datetime-edit-month-field,
+::-webkit-datetime-edit-day-field,
+    ::-webkit-datetime-edit-year-field {
+      color: black; /* Ensures text within date inputs is black */
+    }
+
+    #timeSlot {
+      cursor: pointer;
+      border: 1px solid #90caf9;
+      appearance: auto;
+    }
+  </style>
+
+  <div class="container mt-4 page-content-centered">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <img
+          src="static\images\appointment2.png"
+          alt="Book an Appointment Illustration"
+          class="img-fluid mt-5"
+          height="450"
+          width="450"
+        />
+      </div>
+
+      <div class="col-md-6" style="position: relative; z-index: 10;">
+        <div class="border rounded shadow-sm p-4 form-container">
+          <h3 class="text-center mb-1">Book an Appointment</h3>
+          <form
+            id="appointmentForm"
+            action="{{ url_for('submit_form') }}"
+            method="post"
+          >
+            <div class="form-group">
+              <label for="name" class="form-label">Full Name</label>
+              <input
+                type="text"
+                class="form-control form-input"
+                id="name"
+                name="name"
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+
+            <div class="row">
+              <div class="col-sm-6 form-group">
+                <label for="age" class="form-label">Age</label>
+                <input
+                  type="number"
+                  class="form-control form-input"
+                  id="age"
+                  name="age"
+                  placeholder="Enter your age"
+                  required
+                />
+              </div>
+              <div class="col-sm-6 form-group">
+                <label for="contactNumber" class="form-label"
+                  >Contact Number</label
+                >
+                <input
+                  type="tel"
+                  class="form-control form-input"
+                  id="contactNumber"
+                  name="contactNumber"
+                  placeholder="Enter your number"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Preferred Date and Time Slot side by side -->
+            <div class="row">
+              <div class="col-sm-6 form-group">
+                <label for="preferredDate" class="form-label"
+                  >Preferred Date</label
+                >
+                <input
+                  type="date"
+                  class="form-control form-input"
+                  id="preferredDate"
+                  name="preferredDate"
+                  required
+                />
+              </div>
+              <div class="col-sm-6 form-group">
+                <label for="timeSlot" class="form-label">Time Slot</label>
+                <select
+                  class="form-control form-input2"
+                  id="timeSlot"
+                  name="timeSlot"
+                >
+                  <option value="" disabled selected>Select a Time Slot</option>
+                  <option value="12-1pm">12-1pm</option>
+                  <option value="1-2pm">1-2pm</option>
+                  <option value="4-5pm">4-5pm</option>
+                  <option value="5-6pm">5-6pm</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="form-group">
+              <label for="additionalInfo" class="form-label"
+                >Additional Information</label
+              >
+              <textarea
+                class="form-control form-input"
+                id="additionalInfo"
+                name="additionalInfo"
+                rows="1"
+              ></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+              <button type="submit" class="btn btn-info w-25">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

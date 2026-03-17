@@ -1,0 +1,14 @@
+services:
+  vtherapy:
+    build: .
+    ports:
+      - "5001:5001"
+    volumes:
+      - vtherapy_instance:/app/instance
+      - vtherapy_cam_inputs:/app/cam_inputs
+      - vtherapy_processed:/app/processed_inputs
+
+volumes:
+  vtherapy_instance:
+  vtherapy_cam_inputs:
+  vtherapy_processed:

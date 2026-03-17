@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% block title %}VTherapy{% endblock %}
+{% block content %}
+    <style>
+      .centered {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .button-group {
+        margin-top: 10px;
+      }
+      .button-group button {
+        margin: 0 10px;
+      }
+      .info-group {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+      }
+      .alert {
+        margin: 5px;
+        padding: 8px;
+        font-size: 1rem;
+      }
+    </style>
+
+    <div class="container page-content-centered">
+      <div class="row">
+        <div class="col-6">
+          <div class="mt-2"></div>
+          <video
+            id="mainVideo"
+            width="520"
+            height="360"
+            controls
+            autoplay
+            muted
+            class="my-4 w-100"
+          >
+            <source id="videoSource" src="" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div class="row mt-2">
+            <div class="col-5 d-flex justify-content-center-left">
+              <div class="text-center">
+                <select id="handSelection" class="form-control w-auto mx-auto">
+                  <option value="right" selected>Right Hand</option>
+                  <option value="left">Left Hand</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-7 d-flex justify-content-left">
+              <div class="text-center">
+                <button
+                  id="prevButton"
+                  class="btn btn-primary mr-2"
+                  style="width: 100px"
+                >
+                  Previous
+                </button>
+                <button
+                  id="nextButton"
+                  class="btn btn-primary w-40"
+                  style="width: 90px"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+
+            <div class="info-group">
+              <h6
+                id="videoTitle"
+                class="text-left mt-2 ml-3 alert alert-primary"
+                role="alert"
+              >
+                Class Title Here
+              </h6>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 centered mt-2" style="position: relative; z-index: 10;">
+          <video
+            id="video"
+            width="520"
+            height="360"
+            autoplay
+            class="my-4 w-100"
+          ></video>
+          <div class="button-group">
+            <button id="startButton" class="btn btn-success">Start</button>
+            <button id="stopButton" class="btn btn-danger">Stop</button>
+          </div>
+          <div id="status" class="mt-2"></div>
+
+          <div class="info-group">
+            <div id="prediction" class="alert alert-info" role="alert">
+              Exercise detected: –
+            </div>
+            <div id="accuracy" class="alert alert-success" role="alert">
+              Movement match: –
+            </div>
+            <div id="count" class="alert alert-warning" role="alert">
+              Completed repetitions today: –
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let video = document.getElementById("video");
+      let mediaRecorder;
+      let recordedBlobs;
+      let statusText = document.getElementById("status");
+      let stream = null;
+
+      function stopVideoStream() {
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+          statusText.textContent = "Camera turned off";
+        }
+      }
+
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((mediaStream) => {
+          stream = mediaStream;
+          video.srcObject = stream;
+          statusText.textContent = "Camera is on. Click Start to record.";
+        })
+        .catch((err) => {
+          statusText.textContent = "Camera error: " + (err.message || "Please allow camera access.");
+        });
+
+      document.getElementById("startButton").addEventListener("click", () => {
+        if (!stream || stream.getTracks().every(t => t.readyState === "ended")) {
+          statusText.textContent = "Camera not ready. Please refresh the page.";
+          return;
+        }
+        let options = { mimeType: "video/webm" };
+        recordedBlobs = [];
+        try {
+          mediaRecorder = new MediaRecorder(stream, options);
+        } catch (e) {
+          console.error("Exception while creating MediaRecorder:", e);
+          statusText.textContent = "Recording failed. Please refresh the page.";
+          return;
+        }
+
+        statusText.textContent = "Recording...";
+
+        mediaRecorder.onstop = async () => {
+          statusText.textContent = "Analyzing the video...";
+          let blob = new Blob(recordedBlobs, { type: "video/webm" });
+          let formData = new FormData();
+          formData.append("file", blob, "capture.webm");
+
+          try {
+            if (blob.size < 1000) {
+              statusText.textContent = "Recording too short. Record 2–3 seconds with your hand visible.";
+              return;
+            }
+            let response = await fetch("/upload_video", {
+              method: "POST",
+              body: formData,
+            });
+            let result;
+            try {
+              result = await response.json();
+            } catch (_) {
+              result = {};
+            }
+            if (!response.ok) {
+              statusText.textContent = result.error || `Error: ${response.status}`;
+              return;
+            }
+            const exerciseLabels = { palmfingers: "Spread Palm Fingers", palmfist: "Make a Fist" };
+            const displayName = exerciseLabels[result.prediction] || result.prediction;
+            document.getElementById("prediction").textContent =
+              "Exercise detected: " + displayName;
+            document.getElementById("accuracy").textContent =
+              "Movement match: " + result.accuracy.toFixed(2) + "%";
+            document.getElementById("count").textContent =
+              "Completed repetitions today: " + result.count;
+            statusText.textContent = "Done. Click Start to record another exercise.";
+          } catch (error) {
+            console.error("Error fetching prediction:", error);
+            statusText.textContent = "Error: " + (error.message || "Network or server error. Is the app running?");
+          }
+        };
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data && event.data.size > 0) {
+            recordedBlobs.push(event.data);
+          }
+        };
+        mediaRecorder.start();
+      });
+
+      document.getElementById("stopButton").addEventListener("click", () => {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+          mediaRecorder.stop();
+          // Keep camera running so user can record another exercise without refresh
+        } else {
+          statusText.textContent = "Click Start first to begin recording.";
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const basePath = "{{ url_for('static', filename='videos/') }}"; // Assuming Flask structure
+
+        let videos = {
+          right: [
+            {
+              src: basePath + "palmfingright.mp4",
+              title: "Flexibility Exercises",
+              type: "video/mp4",
+            },
+            {
+              src: basePath + "palmfistright.mp4",
+              title: "Range of Motion Exercises",
+              type: "video/mp4",
+            },
+          ],
+          left: [
+            {
+              src: basePath + "palmfingleft.mp4",
+              title: "Flexibility Exercises",
+              type: "video/mp4",
+            },
+            {
+              src: basePath + "palmfistleft.mp4",
+              title: "Range of Motion Exercises",
+              type: "video/mp4",
+            },
+          ],
+        };
+
+        let currentIndex = 0;
+        let currentHand = "right"; 
+
+        const videoElement = document.getElementById("mainVideo");
+        const videoSource = document.getElementById("videoSource");
+        const videoTitle = document.getElementById("videoTitle");
+        const prevButton = document.getElementById("prevButton");
+        const nextButton = document.getElementById("nextButton");
+        const handSelection = document.getElementById("handSelection");
+
+        function updateVideo(hand, index) {
+          videoSource.src = videos[hand][index].src;
+          videoSource.type = videos[hand][index].type;
+          videoTitle.textContent = videos[hand][index].title;
+          videoElement.load();
+        }
+
+        updateVideo(currentHand, currentIndex);
+
+        prevButton.addEventListener("click", function () {
+          if (currentIndex > 0) {
+            currentIndex--;
+            updateVideo(currentHand, currentIndex);
+          }
+        });
+
+        nextButton.addEventListener("click", function () {
+          if (currentIndex < videos[currentHand].length - 1) {
+            currentIndex++;
+            updateVideo(currentHand, currentIndex);
+          }
+        });
+
+        handSelection.addEventListener("change", function () {
+          currentHand = this.value;
+          currentIndex = 0; // Reset to the first video of the selected hand
+          updateVideo(currentHand, currentIndex);
+        });
+      });
+
+    </script>
+{% endblock %}

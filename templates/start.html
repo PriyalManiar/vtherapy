@@ -1,0 +1,116 @@
+{% extends "base.html" %} {% block title %} Virtuotherapy {%
+endblock %} {% block extra_css %}
+<style>
+  .container {
+  }
+
+  h1 .vtherapy-color {
+    color: blue !important;
+  }
+
+  .hero-section {
+    padding: 2rem 0; /* Adjust padding as needed */
+  }
+
+  .hero-section .btn-primary {
+    background-color: #007bff; /* Primary button color */
+    border: none; /* Remove border */
+    font-size: 1rem; /* Adjust font size as needed */
+  }
+
+  .card {
+    text-align: center; /* Center align card content */
+  }
+
+  .card-icon {
+    font-size: 4rem; /* Adjust icon size as needed */
+    margin-bottom: 1rem; /* Space below icon */
+  }
+
+  .illustration-img {
+    display: block;
+    margin-left: auto;
+    margin-right: 0;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container hero-section page-content-centered">
+  <div class="row"></div>
+  <div class="row align-items-center">
+    <!-- Left Column for Text and Button -->
+    <div class="col-md-6">
+      <h1>
+        Welcome to <span class="text-primary">VTherapy</span> - <br />The
+        world of remote physiotherapy!
+      </h1>
+      <br>
+      <p class="lead mb-4">Experience Personalized Care and Embrace a Healthier Tomorrow - Your Journey to Wellness Begins with a Click!</p>
+      <a
+        class="btn btn-primary btn-lg"
+        href="{{ url_for('vtherapy') }}"
+        role="button"
+      >
+        Start Now <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+    <!-- Right Column for Illustration -->
+    <div class="col-md-6 d-flex justify-content-center">
+      <img
+        src="static\images\landingpagevector.png"
+        class="illustration-img ml-5"
+        alt="Illustration"
+        width="330"
+        height="460"
+      />
+    </div>
+  </div>
+</div>
+
+<!--
+<div class="container mt-5">
+  <div class="row">
+ 
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <i class="bi bi-heart-fill card-icon"></i>
+          <h5 class="card-title">Feature 1</h5>
+          <p class="card-text">Brief description of Feature 1.</p>
+        </div>
+      </div>
+    </div>
+   
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <i class="bi bi-speedometer2 card-icon"></i>
+          <h5 class="card-title">Feature 2</h5>
+          <p class="card-text">Brief description of Feature 2.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <i class="bi bi-people-fill card-icon"></i>
+          <h5 class="card-title">Feature 3</h5>
+          <p class="card-text">Brief description of Feature 3.</p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <i class="bi bi-globe card-icon"></i>
+          <h5 class="card-title">Feature 4</h5>
+          <p class="card-text">Brief description of Feature 4.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+-->
+
+{% endblock %}

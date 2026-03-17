@@ -1,0 +1,10 @@
+.jumbotron {
+    background: url('/static/images/your-background-image.jpg') no-repeat center center;
+    background-size: cover;
+    color: #fff;
+}
+
+.jumbotron .btn-primary {
+    background-color: #007bff; /* Adjust the button color as needed */
+}
+

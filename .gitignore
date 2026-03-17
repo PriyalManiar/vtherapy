@@ -1,0 +1,14 @@
+# Model weights
+*.pth
+*.h5
+models/
+
+# Video captures and uploads
+uploads/
+*.mp4
+*.webm
+
+# Python/System junk
+__pycache__/
+venv/
+.DS_Store

@@ -1,0 +1,126 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "Hi",
+        "Hey",
+        "How are you",
+        "Hiee",
+        "Hello",
+        "hey",
+        "hello"
+      ],
+      "responses": [
+        "Hey, good to see you today!",
+        "Hello, how can I help you",
+        "Hi there, what can I do for you?",
+        "Hi there, how can I help?"
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": ["Bye", "See you later", "Goodbye","bye","goodbye","cya"],
+      "responses": [
+        "See you later, thanks for visiting",
+        "Have a nice day",
+        "Bye! Come back again soon."
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": ["Thanks", "Thank you", "That's helpful", "Thank's a lot!","Thank you so much!"],
+      "responses": ["Happy to help!", "Any time!", "My pleasure"]
+    },
+    {
+      "tag": "hand_shaking",
+      "patterns": [
+        "Why is my hand shaking while performing the exercises?",
+        "My hand is shaking during exercise?",
+        "Why does my hand shake during the exercise?"
+      ],
+      "responses": [
+        "It's completely normal to experience some shaking. Your body is adjusting and building strength. Just take it slow, focus on your form, and with time, the shaking will lessen as your muscles get stronger."
+      ]
+    },
+    {
+      "tag": "pain",
+      "patterns": [
+        "What should I do if I feel pain during the exercises?",
+        "Pain during exercises.",
+        "Why does my hand hurt while exercising?",
+        "My hand hurts while exercising."
+      ],
+      "responses": [
+        "If you feel pain, it's important to stop the exercise and rest. Maybe you need to adjust your hand position or reduce the intensity. We'll work together to find what's best for you so you can continue your recovery comfortably."
+      ]
+    },
+    {
+      "tag": "stiffness",
+      "patterns": [
+        "Is it normal to experience stiffness in my hand after exercising?",
+        "My hand is stiff.What do I do?",
+        "Why is my hand stiff while exercising?"
+      ],
+      "responses": [
+        "Absolutely, stiffness is common, especially if your hand hasn't been moving much. Think of it as your muscles waking up. Gentle stretching and moving your hand throughout the day can help ease the stiffness. We'll work on it together, and you'll feel more limber with time."
+      ]
+    },
+    {
+      "tag": "exr_frequency",
+      "patterns": [
+        "How often should I perform the hand exercises?",
+        "How many reps should I perform?",
+        "How frequently should I exercise?"
+      ],
+      "responses": [
+        "We'll tailor your exercise routine to suit your needs, but generally, doing them daily is a great start. Consistency is key to progress.Start with 5 reps of each exercise daily."
+      ]
+    },
+    {
+      "tag": "extend",
+      "patterns": [
+        "I'm unable to extend my fingers fully, what do I do?",
+        "My fingers won't extend, what do I do?",
+        "Why are my fingers not extending?"
+      ],
+      "responses": [
+        "We'll work on it gradually. It's common to have some limitations at first, but with targeted exercises and gentle stretching, we can improve your finger extension over time. Every little improvement is a step forward on your journey to recovery."
+      ]
+    },
+    {
+      "tag": "tired",
+      "patterns": [
+        "Is it normal to feel tired after performing the exercises?",
+        "I am tired after performing the exercises.",
+        "Is it okay to be tired after the exercise?"
+      ],
+      "responses": [
+        "Absolutely, you're giving your muscles a workout! Feeling a bit tired afterward is completely normal, but it's also a sign that you're pushing yourself in the right direction. Make sure to rest and hydrate, and know that every exercise session brings you closer to your goals."
+      ]
+    },
+    {
+      "tag": "improvement",
+      "patterns": [
+        "How soon can I expect to see improvements?",
+        "When will I see improvement?",
+        "When will my hand be alright?",
+        "When can I expect results?"
+      ],
+      "responses": [
+        "Every person's journey is unique, but with dedication and consistency, you'll start to notice improvements over time. Even small progressions are worth celebrating! Together, we'll celebrate each milestone along the way to reaching your goals."
+      ]
+    },
+    {
+      "tag": "swelling",
+      "patterns": [
+        "How can I prevent swelling in my hand after exercising?",
+        "My hand is swollen after exercising.",
+        "What do I do to reduce swelling after exercises?"
+      ],
+      "responses": [
+        "Elevating your hand and applying ice can help reduce swelling. Gentle massage and movement can also promote circulation."
+      ]
+    }
+  ]
+}
