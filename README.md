@@ -1,4 +1,4 @@
-# VTherapy: DL-based Post Injury Hand Rehabilitation System
+# VTherapy: DL-based Hand Rehabilitation System Post Injury
 
 ## Code Authors: Priyal Maniar & Gargi Vedpathak
 ## Published Work: [IEEE](https://ieeexplore.ieee.org/document/10842730)
